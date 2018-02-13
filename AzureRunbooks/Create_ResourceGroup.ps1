@@ -14,7 +14,15 @@ param (
 
     [Parameter(Mandatory=$true)]
     [string]
-    $TagOriginator
+    $TagOriginator,
+
+    [Parameter(Mandatory=$false)]
+    [string]
+    $Contributors,
+    
+    [Parameter(Mandatory=$false)]
+    [string]
+    $NetworkContributors
 )
 
 # Authenticate to Azure if running from Azure Automation
@@ -33,3 +41,12 @@ $r = Get-AzureRmResourceGroup -Name $ResourceGroupName
 $r.tags += @{Name="CostCenter";Value=$TagCostCenter}
 $r.tags += @{Name="Originator";Value="$TagOriginator"}
 Set-AzureRmResourceGroup -Name $ResourceGroupName -Tag $r.tags
+
+#Finding ADGroups and Roles to assign 
+$ContributorGroup = Get-AzureRmADGroup -SearchString $Contributors  | Where-Object {$_.SecurityEnabled -eq $true}
+$ContributorRole = Get-AzureRmRoleDefinition Contributor | select Name, Description, IsCustom, Id
+$NetworkContributorGroup = Get-AzureRmADGroup -SearchString $NetworkContributors | Where-Object {$_.SecurityEnabled -eq $true}
+$NetworkContributorRole = Get-AzureRmRoleDefinition NetworkContributor | select Name, Description, IsCustom, Id
+
+#Assigning the Roles to ADGroups
+New-AzureRmRoleAssignment -ObjectId $ContributorGroup.Id -Scope "$ResourceGroupName" -RoleDefinitionId $ContributorRole.Id
