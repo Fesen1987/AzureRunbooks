@@ -51,11 +51,10 @@ Connect-AzureAD `
 #Set-AzureRmResourceGroup -Name $ResourceGroupName -Tag $r.tags
 
 #Finding ADGroups and Azure Roles to assign 
-#$ContributorGroup = Get-AzureRmADGroup -SearchString $Contributors  | Where-Object {$_.SecurityEnabled -eq $true}
-$ContributorGroup = Get-MSOLGroup -SearchString $Contributors  | Where-Object {$_.SecurityEnabled -eq $true}
-$ContributorRole = Get-AzureRmRoleDefinition Contributor | Select-Object Name, Description, IsCustom, Id
+$ContributorGroup = Get-AzureRmADGroup -SearchString $Contributors  | Where-Object {$_.SecurityEnabled -eq $true}
+$ContributorRole = Get-AzureRmRoleDefinition Contributor | select Name, Description, IsCustom, Id
 $NetworkContributorGroup = Get-AzureRmADGroup -SearchString $NetworkContributors | Where-Object {$_.SecurityEnabled -eq $true}
-$NetworkContributorRole = Get-AzureRmRoleDefinition "Network Contributor" | Select-Object Name, Description, IsCustom, Id
+$NetworkContributorRole = Get-AzureRmRoleDefinition "Network Contributor" | select Name, Description, IsCustom, Id
 
 write-output $ContributorGroup
 write-output $ContributorRole
