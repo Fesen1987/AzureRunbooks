@@ -34,19 +34,24 @@ Add-AzureRmAccount `
     -CertificateThumbprint $ServicePrincipalConnection.CertificateThumbprint | Write-Verbose
 
 # Creating resource group initially
-New-AzureRmResourceGroup -Name $ResourceGroupName -Location "West Europe" -Tag @{Name="Owner";Value=$TagOwner}
+#New-AzureRmResourceGroup -Name $ResourceGroupName -Location "West Europe" -Tag @{Name="Owner";Value=$TagOwner}
 
 # Adding designated Tags
-$r = Get-AzureRmResourceGroup -Name $ResourceGroupName
-$r.tags += @{Name="CostCenter";Value=$TagCostCenter}
-$r.tags += @{Name="Originator";Value="$TagOriginator"}
-Set-AzureRmResourceGroup -Name $ResourceGroupName -Tag $r.tags
+#$r = Get-AzureRmResourceGroup -Name $ResourceGroupName
+#$r.tags += @{Name="CostCenter";Value=$TagCostCenter}
+#$r.tags += @{Name="Originator";Value="$TagOriginator"}
+#Set-AzureRmResourceGroup -Name $ResourceGroupName -Tag $r.tags
 
 #Finding ADGroups and Roles to assign 
 $ContributorGroup = Get-AzureRmADGroup -SearchString $Contributors  | Where-Object {$_.SecurityEnabled -eq $true}
 $ContributorRole = Get-AzureRmRoleDefinition Contributor | select Name, Description, IsCustom, Id
 $NetworkContributorGroup = Get-AzureRmADGroup -SearchString $NetworkContributors | Where-Object {$_.SecurityEnabled -eq $true}
-$NetworkContributorRole = Get-AzureRmRoleDefinition NetworkContributor | select Name, Description, IsCustom, Id
+$NetworkContributorRole = Get-AzureRmRoleDefinition "Network Contributor" | select Name, Description, IsCustom, Id
+
+write-output $ContributorGroup
+write-output $ContributorRole
+write-output $NetworkContributorGroup
+write-output $NetworkContributorRole
 
 #Assigning the Roles to ADGroups
-New-AzureRmRoleAssignment -ObjectId $ContributorGroup.Id -Scope "$ResourceGroupName" -RoleDefinitionId $ContributorRole.Id
+#New-AzureRmRoleAssignment -ObjectId $ContributorGroup.Id -Scope "$ResourceGroupName" -RoleDefinitionId $ContributorRole.Id
